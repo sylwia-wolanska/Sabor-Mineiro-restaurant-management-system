@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Delivery Options — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Delivery Options</h1>
+        <p>How would you like to receive your order?</p>
+    </div>
+
+    <div class="wizard-steps">
+        <div class="wizard-step done"><div class="step-number">✓</div><div class="step-label">Select Dishes</div></div>
+        <div class="step-divider"></div>
+        <div class="wizard-step done"><div class="step-number">✓</div><div class="step-label">Summary</div></div>
+        <div class="step-divider"></div>
+        <div class="wizard-step active"><div class="step-number">3</div><div class="step-label">Delivery</div></div>
+        <div class="step-divider"></div>
+        <div class="wizard-step"><div class="step-number">4</div><div class="step-label">Confirm</div></div>
+    </div>
+
+    <form th:action="@{/orders/new/confirm}" method="post">
+        <div class="card">
+            <h2>Choose Delivery Option</h2>
+
+            <div style="display:flex; gap:1.5rem; margin-bottom:2rem; flex-wrap:wrap;">
+
+                <label style="flex:1; min-width:220px; cursor:pointer;">
+                    <div style="border:2px solid #e5e7eb; border-radius:12px; padding:1.5rem; transition:border-color 0.2s;" id="pickupCard">
+                        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+                            <input type="radio" name="pickupOption" value="pickup"
+                                   id="radioPickup" onchange="toggleDelivery()"
+                                   style="width:18px; height:18px; accent-color:var(--verde);"/>
+                            <span style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--marrom);">
+                                 Pick Up at Restaurant
+                            </span>
+                        </div>
+                        <p style="color:var(--cinza); font-size:0.88rem;">
+                            Come collect your order at the counter. Specify your pickup time.
+                        </p>
+                    </div>
+                </label>
+
+                <label style="flex:1; min-width:220px; cursor:pointer;">
+                    <div style="border:2px solid #e5e7eb; border-radius:12px; padding:1.5rem; transition:border-color 0.2s;" id="deliveryCard">
+                        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+                            <input type="radio" name="pickupOption" value="delivery"
+                                   id="radioDelivery" onchange="toggleDelivery()"
+                                   style="width:18px; height:18px; accent-color:var(--verde);"/>
+                            <span style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--marrom);">
+                                 Home Delivery
+                            </span>
+                        </div>
+                        <p style="color:var(--cinza); font-size:0.88rem;">
+                            We deliver to your address. Fill in the details below.
+                        </p>
+                    </div>
+                </label>
+            </div>
+
+            <div id="pickupFields" style="display:none;">
+                <div class="form-group">
+                    <label for="hourOfPickup">Pickup Time</label>
+                    <input type="time" id="hourOfPickup" name="hourOfPickup"/>
+                </div>
+            </div>
+
+            <div id="deliveryFields" style="display:none;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label for="street">Street / Avenue</label>
+                        <input type="text" id="street" name="street" placeholder="e.g. Rua dos Inconfidentes"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="buildingNumber">Building Number</label>
+                        <input type="text" id="buildingNumber" name="buildingNumber" placeholder="e.g. 320"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="apartmentNumber">Apartment Number (optional)</label>
+                        <input type="number" id="apartmentNumber" name="apartmentNumber" placeholder="e.g. 12"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Next →</button>
+        </div>
+    </form>
+
+    <script>
+        function toggleDelivery() {
+            const isPickup   = document.getElementById('radioPickup').checked;
+            const isDelivery = document.getElementById('radioDelivery').checked;
+            document.getElementById('pickupFields').style.display   = isPickup   ? 'block' : 'none';
+            document.getElementById('deliveryFields').style.display = isDelivery ? 'block' : 'none';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('pickupCard').style.borderColor   = isPickup   ? 'var(--verde)' : '#e5e7eb';
+            document.getElementById('deliveryCard').style.borderColor = isDelivery ? 'var(--verde)' : '#e5e7eb';
+        }
+    </script>
+</section>
+</body>
+</html>

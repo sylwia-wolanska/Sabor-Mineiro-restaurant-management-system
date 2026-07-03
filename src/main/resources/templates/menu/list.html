@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Menu — Sabor Mineiro</title></head>
+<body>
+<section>
+
+    <div class="page-header">
+        <h1>Our Menu</h1>
+        <p th:if="${loggedInPerson != null and loggedInPerson.role == 'CHEF'}">
+             Click any dish to edit its ingredients.
+        </p>
+        <p th:unless="${loggedInPerson != null and loggedInPerson.role == 'CHEF'}">
+            Click any dish to see its ingredients.
+        </p>
+    </div>
+
+    <div class="menu-grid">
+        <div class="menu-card" th:each="item : ${menuItems}">
+            <h3 th:text="${item.name()}">Feijão Tropeiro</h3>
+            <div class="meta">
+                <span th:text="${item.preparationTime()}">30</span> min ·
+                <span th:text="${item.ingredientCount()}">7</span> ingredients
+            </div>
+            <div class="price">
+                R$ <span th:text="${#numbers.formatDecimal(item.price(), 1, 2)}">42.00</span>
+            </div>
+            <div class="actions" style="margin-top:1rem;">
+                <a th:href="@{/menu/{id}(id=${item.id()})}"
+                   class="btn btn-outline"
+                   style="width:100%; text-align:center;">
+                    <span th:if="${loggedInPerson != null and loggedInPerson.role == 'CHEF'}">
+                        Edit Recipe
+                    </span>
+                    <span th:unless="${loggedInPerson != null and loggedInPerson.role == 'CHEF'}">
+                        View Ingredients →
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(menuItems)}"
+         style="text-align:center; color:var(--cinza); padding:3rem;">
+        No menu items found.
+    </div>
+
+</section>
+</body>
+</html>

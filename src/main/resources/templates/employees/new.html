@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Add Employee — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Add Employee</h1>
+        <p>Create a new staff member account</p>
+    </div>
+
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card" style="max-width:560px;">
+        <form th:action="@{/employees/new}" method="post">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group">
+                    <label for="name">First Name</label>
+                    <input type="text" id="name" name="name"
+                           th:value="${form.name}" required/>
+                </div>
+                <div class="form-group">
+                    <label for="surname">Last Name</label>
+                    <input type="text" id="surname" name="surname"
+                           th:value="${form.surname}" required/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" name="role" required onchange="toggleLicense(this.value)">
+                    <option value="">— select role —</option>
+                    <option value="WAITER">Waiter</option>
+                    <option value="CHEF">Chef</option>
+                    <option value="DELIVERY_DRIVER">Delivery Driver</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="licenseGroup" style="display:none;">
+                <label for="drivingLicenseNumber">Driving License Number</label>
+                <input type="text" id="drivingLicenseNumber"
+                       name="drivingLicenseNumber"
+                       th:value="${form.drivingLicenseNumber}"
+                       placeholder="e.g. MG/123456/2020"/>
+            </div>
+
+            <div class="form-group">
+                <label for="salaryPerHour">Salary per Hour (R$)</label>
+                <input type="number" id="salaryPerHour" name="salaryPerHour"
+                       th:value="${form.salaryPerHour}"
+                       min="0.01" step="0.01" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username"
+                       th:value="${form.username}" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required/>
+            </div>
+
+            <div class="actions">
+                <a th:href="@{/employees}" class="btn btn-outline">← Cancel</a>
+                <button type="submit" class="btn btn-primary">Create Employee</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function toggleLicense(role) {
+            document.getElementById('licenseGroup').style.display =
+                role === 'DELIVERY_DRIVER' ? 'block' : 'none';
+        }
+    </script>
+</section>
+</body>
+</html>

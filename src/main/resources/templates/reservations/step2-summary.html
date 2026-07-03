@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Table Available — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Table Available</h1>
+        <p>We found the perfect table for your reservation</p>
+    </div>
+
+    <div class="wizard-steps">
+        <div class="wizard-step done"><div class="step-number">✓</div><div class="step-label">Date &amp; People</div></div>
+        <div class="step-divider"></div>
+        <div class="wizard-step active"><div class="step-number">2</div><div class="step-label">Table Found</div></div>
+        <div class="step-divider"></div>
+        <div class="wizard-step"><div class="step-number">3</div><div class="step-label">Confirmation</div></div>
+    </div>
+
+    <div class="alert alert-success">
+        ✓ Table available for
+        <strong th:text="${numberOfPeople}">4</strong> guest(s)
+        on <strong th:text="${#temporals.format(dateTime, 'dd/MM/yyyy HH:mm')}">15/01/2024 19:00</strong>.
+    </div>
+
+    <div class="card">
+        <h2>Selected Table</h2>
+        <div class="summary-box">
+            <div class="summary-row">
+                <span class="label">Table Number</span>
+                <span class="value">#<span th:text="${table.id}">3</span></span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Table Capacity</span>
+                <span class="value" th:text="${table.maxPeople} + ' people'">4 people</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Guests</span>
+                <span class="value" th:text="${numberOfPeople} + ' people'">4 people</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Date &amp; Time</span>
+                <span class="value"
+                      th:text="${#temporals.format(dateTime, 'dd/MM/yyyy')}
+                               + ' at '
+                               + ${#temporals.format(dateTime, 'HH:mm')}">
+                    15/01/2024 at 19:00
+                </span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Duration</span>
+                <span class="value">2 hours</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Status upon confirmation</span>
+                <span class="badge badge-accepted">ACCEPTED</span>
+            </div>
+        </div>
+        <div class="alert alert-info" style="margin-top:1rem;">
+            The table was selected automatically — we chose the smallest available table
+            that fits your party, ensuring the best use of space.
+        </div>
+    </div>
+
+    <form th:action="@{/reservations/new/confirm}" method="post">
+        <div class="actions">
+            <button type="submit" name="action" value="edit"    class="btn btn-outline">← Edit</button>
+            <button type="submit" name="action" value="confirm" class="btn btn-secondary">✓ Confirm Reservation</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Order Detail — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Order <span th:text="'#' + ${order.id()}">#1</span></h1>
+        <p>Order details and items</p>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+    <div class="card">
+        <h2>Order Information</h2>
+        <div class="detail-row">
+            <span class="detail-label">Client</span>
+            <span th:text="${order.clientName()}">Mariana Souza</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Status</span>
+            <span class="badge"
+                  th:classappend="'badge-' + ${#strings.toLowerCase(order.orderStatus())}"
+                  th:text="${order.orderStatus()}">INITIALIZED</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Type</span>
+            <span th:if="${order.orderType() == 'PICKUP'}"> Pickup at Restaurant</span>
+            <span th:unless="${order.orderType() == 'PICKUP'}"> Home Delivery</span>
+        </div>
+        <div th:if="${order.orderType() == 'PICKUP'}">
+            <div class="detail-row">
+                <span class="detail-label">Pickup Time</span>
+                <span th:text="${order.hourOfPickup()}">13:30</span>
+            </div>
+        </div>
+        <div th:unless="${order.orderType() == 'PICKUP'}">
+            <div class="detail-row">
+                <span class="detail-label">Delivery Address</span>
+                <span th:text="${order.fullAddress()}">Rua dos Inconfidentes, 320/12</span>
+            </div>
+            <div class="detail-row" th:if="${order.deliveryDriverName() != null}">
+                <span class="detail-label">Delivery Driver</span>
+                <span th:text="${order.deliveryDriverName()}">Rodrigo Santos</span>
+            </div>
+        </div>
+        <div class="detail-row" th:if="${order.waiterName() != null}">
+            <span class="detail-label">Assigned Waiter</span>
+            <span th:text="${order.waiterName()}">Carlos Oliveira</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Order Items</h2>
+        <p style="color:var(--cinza); font-size:0.88rem; margin-bottom:1rem;">
+            Loaded via association: <code>Order → MenuItemQuantity → MenuItem</code>
+        </p>
+        <table>
+            <thead>
+            <tr>
+                <th>Dish</th>
+                <th>Prep Time</th>
+                <th>Unit Price</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${order.items()}">
+                <td><strong th:text="${item.menuItemName()}">Feijão Tropeiro</strong></td>
+                <td th:text="${item.preparationTime()} + ' min'">30 min</td>
+                <td>R$ <span th:text="${#numbers.formatDecimal(item.unitPrice(), 1, 2)}">26.05</span></td>
+                <td th:text="${item.quantity()}">2</td>
+                <td>R$ <span th:text="${#numbers.formatDecimal(item.subtotal(), 1, 2)}">52.10</span></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="summary-box" style="margin-top:1.5rem;">
+            <div class="summary-row">
+                <span class="label">⏱ Estimated preparation time</span>
+                <span class="value"
+                      th:text="${order.estimatedPrepTime()} + ' minutes'">30 minutes</span>
+            </div>
+            <div class="total-row">
+                <span>Order Total</span>
+                <span>R$ <span th:text="${#numbers.formatDecimal(order.totalPrice(), 1, 2)}">84.00</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card"
+         th:if="${loggedInPerson != null
+                  and loggedInPerson.role == 'WAITER'
+                  and order.waiterId() != null
+                  and order.waiterId() == loggedInPerson.id
+                  and order.orderStatus() != 'COMPLETED'
+                  and order.orderStatus() != 'CANCELLED'}">
+        <h2>Update Order Status</h2>
+        <form th:action="@{/orders/{id}/status(id=${order.id()})}" method="post">
+            <div style="display:flex; gap:1rem; align-items:flex-end; flex-wrap:wrap;">
+                <div class="form-group" style="margin:0; flex:1; min-width:200px;">
+                    <label for="status">New Status</label>
+                    <select id="status" name="status">
+                        <th:block th:if="${order.orderStatus() == 'INITIALIZED'}">
+                            <option value="IN_PREPARATION"> In Preparation</option>
+                            <option value="CANCELLED">✕ Cancelled</option>
+                        </th:block>
+                        <th:block th:if="${order.orderStatus() == 'IN_PREPARATION'}">
+                            <option value="COMPLETED">✓ Completed</option>
+                        </th:block>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="alert alert-info"
+         th:if="${loggedInPerson != null
+                  and loggedInPerson.role == 'WAITER'
+                  and (order.waiterId() == null or order.waiterId() != loggedInPerson.id)}">
+        You are not assigned to this order.
+    </div>
+
+    <div class="alert alert-info"
+         th:if="${loggedInPerson != null
+                  and loggedInPerson.role == 'WAITER'
+                  and order.waiterId() != null
+                  and order.waiterId() == loggedInPerson.id
+                  and (order.orderStatus() == 'COMPLETED'
+                       or order.orderStatus() == 'CANCELLED')}">
+        This order is <strong th:text="${order.orderStatus()}">COMPLETED</strong>
+        — no further status changes possible.
+    </div>
+
+    <div class="actions">
+        <a th:href="@{/orders}" class="btn btn-outline"><- Back to Orders</a>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>New Reservation — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>New Reservation</h1>
+        <p>Book a table at Sabor Mineiro</p>
+    </div>
+
+    <div class="wizard-steps">
+        <div class="wizard-step active"><div class="step-number">1</div><div class="step-label">Date &amp; People</div></div>
+        <div class="step-divider"></div>
+        <div class="wizard-step"><div class="step-number">2</div><div class="step-label">Table Found</div></div>
+        <div class="step-divider"></div>
+        <div class="wizard-step"><div class="step-number">3</div><div class="step-label">Confirmation</div></div>
+    </div>
+
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card">
+        <h2>Reservation Details</h2>
+        <form th:action="@{/reservations/new/find-table}" method="post">
+            <div class="form-group">
+                <label for="dateTime">Date and Time</label>
+                <input type="datetime-local" id="dateTime" name="dateTime"
+                       th:attr="min=${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd''T''HH:mm')}"
+                       th:value="${wizard != null and wizard.dateTime != null}
+                                   ? ${#temporals.format(wizard.dateTime, 'yyyy-MM-dd''T''HH:mm')} : ''"
+                       required/>
+                <small style="color:var(--cinza); font-size:0.82rem;">
+                    Reservations last 2 hours.
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="numberOfPeople">Number of People</label>
+                <input type="number" id="numberOfPeople" name="numberOfPeople"
+                       min="1" max="20"
+                       th:value="${wizard != null and wizard.numberOfPeople != null}
+                                  ? ${wizard.numberOfPeople} : 1"
+                       required/>
+            </div>
+            <div class="alert alert-info">
+                The system will automatically find an available table suitable for the number of people
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Check Availability →</button>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

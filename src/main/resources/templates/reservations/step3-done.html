@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Reservation Confirmed — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="card" style="text-align:center; padding:3rem 2rem;">
+        <div class="success-icon">✓</div>
+        <h1 style="font-family:'Playfair Display',serif; color:var(--verde); font-size:2rem; margin-bottom:0.5rem;">
+            Reservation Confirmed!
+        </h1>
+        <p style="color:var(--cinza); margin-bottom:2rem;">Your reservation has been successfully created. See you soon!</p>
+
+        <div class="summary-box" style="text-align:left; max-width:420px; margin:0 auto 2rem;">
+            <div class="summary-row">
+                <span class="label">Reservation Number</span>
+                <span class="value">#<span th:text="${reservationId}">1</span></span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Date &amp; Time</span>
+                <span class="value"
+                      th:text="${#temporals.format(dateTime, 'dd/MM/yyyy')} + ' at ' + ${#temporals.format(dateTime, 'HH:mm')}">
+                    15/01/2024 at 19:00
+                </span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Guests</span>
+                <span class="value" th:text="${numberOfPeople} + ' guest(s)'">4 guests</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Table Capacity</span>
+                <span class="value" th:text="${tableMaxPeople} + ' people'">4 people</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Status</span>
+                <span class="badge badge-accepted" th:text="${status}">ACCEPTED</span>
+            </div>
+        </div>
+
+        <div class="actions" style="justify-content:center;">
+            <a th:href="@{/reservations}"     class="btn btn-outline">View All Reservations</a>
+            <a th:href="@{/reservations/new}" class="btn btn-primary">New Reservation</a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

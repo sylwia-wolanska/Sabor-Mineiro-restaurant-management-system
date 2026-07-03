@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Place Order — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Place an Order</h1>
+        <p>Select dishes from our menu</p>
+    </div>
+
+    <div class="wizard-steps">
+        <div class="wizard-step active">
+            <div class="step-number">1</div>
+            <div class="step-label">Select Dishes</div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="wizard-step">
+            <div class="step-number">2</div>
+            <div class="step-label">Summary</div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="wizard-step">
+            <div class="step-number">3</div>
+            <div class="step-label">Delivery</div>
+        </div>
+        <div class="step-divider"></div>
+        <div class="wizard-step">
+            <div class="step-number">4</div>
+            <div class="step-label">Confirm</div>
+        </div>
+    </div>
+
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/orders/new/summary}" method="post">
+        <div class="menu-grid">
+            <div class="menu-card" th:each="item : ${menuItems}">
+                <h3 th:text="${item.name()}">Feijao Tropeiro</h3>
+                <div class="meta">
+                    <span th:text="${item.preparationTime()}">30</span> min preparation time
+                </div>
+                <div class="price">
+                    R$ <span th:text="${#numbers.formatDecimal(item.price(), 1, 2)}">42.00</span>
+                </div>
+                <div class="qty-input">
+                    <label th:for="'qty_' + ${item.id()}">Qty:</label>
+                    <input type="number"
+                           th:name="'qty_' + ${item.id()}"
+                           th:id="'qty_' + ${item.id()}"
+                           min="0" max="20"
+                           th:value="${previousSelections != null
+                                       and previousSelections[item.id()] != null}
+                                      ? ${previousSelections[item.id()]} : 0"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Next →</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

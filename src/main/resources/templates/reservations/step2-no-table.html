@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>No Tables Available — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>No Tables Available</h1>
+        <p>We could not find a table for the requested time</p>
+    </div>
+
+    <div class="card" style="text-align:center; padding:3rem 2rem;">
+        <div style="font-size:4rem; margin-bottom:1rem;"></div>
+        <h2 style="margin-bottom:1rem;">Unfortunately, no tables are available</h2>
+        <p style="color:var(--cinza); margin-bottom:0.5rem;">
+            No table found for <strong th:text="${numberOfPeople}">4</strong> guest(s)
+            on <strong th:text="${#temporals.format(dateTime, 'dd/MM/yyyy HH:mm')}">15/01/2024 19:00</strong>.
+        </p>
+        <p style="color:var(--cinza); margin-bottom:2rem;">
+            All suitable tables are already reserved within 2 hours of the requested time.
+        </p>
+        <a th:href="@{/reservations/new}" class="btn btn-primary">Try Again</a>
+    </div>
+</section>
+</body>
+</html>

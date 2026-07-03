@@ -1,0 +1,10 @@
+
+.gradle
+build
+.kotlin
+target/
+.idea/
+*.iml
+.env
+application-local.properties
+*.log

@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Reservations — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Reservations</h1>
+        <p th:if="${loggedInPerson != null and loggedInPerson.role == 'CLIENT'}">
+            Your reservations
+        </p>
+        <p th:unless="${loggedInPerson != null and loggedInPerson.role == 'CLIENT'}">
+            All restaurant reservations
+        </p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;"
+         th:if="${loggedInPerson != null and loggedInPerson.role == 'CLIENT'}">
+        <a th:href="@{/reservations/new}" class="btn btn-primary">+ New Reservation</a>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+    <div class="card">
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Client</th>
+                <th>Date &amp; Time</th>
+                <th>Guests</th>
+                <th>Table</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="res : ${reservations}">
+                <td th:text="${res.id()}">1</td>
+                <td th:text="${res.clientName()}">Mariana Souza</td>
+                <td th:text="${#temporals.format(res.dateTime(), 'dd/MM/yyyy HH:mm')}">15/01/2024 19:00</td>
+                <td th:text="${res.countOfPeople()}">4</td>
+                <td th:text="'Table #' + ${res.tableId()}">Table #2</td>
+                <td>
+                    <span class="badge"
+                          th:classappend="'badge-' + ${#strings.toLowerCase(res.reservationStatus())}"
+                          th:text="${res.reservationStatus()}">ACCEPTED</span>
+                </td>
+                <td style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    <a th:href="@{/reservations/{id}(id=${res.id()})}"
+                       class="btn btn-sm btn-outline">View</a>
+
+                    <a th:if="${loggedInPerson != null
+                                and loggedInPerson.role == 'CLIENT'
+                                and res.clientId() == loggedInPerson.id
+                                and (res.reservationStatus() == 'ACCEPTED'
+                                     or res.reservationStatus() == 'RESCHEDULED')}"
+                       th:href="@{/reservations/{id}/reschedule(id=${res.id()})}"
+                       class="btn btn-sm btn-secondary">
+                        🗓 Reschedule
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(reservations)}">
+                <td colspan="7" style="text-align:center; color:var(--cinza); padding:2rem;">
+                    No reservations found.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

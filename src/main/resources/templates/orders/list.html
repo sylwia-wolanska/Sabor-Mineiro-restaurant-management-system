@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Orders — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Orders</h1>
+        <p th:if="${loggedInPerson != null and loggedInPerson.role == 'CLIENT'}">
+            Your orders
+        </p>
+        <p th:unless="${loggedInPerson != null and loggedInPerson.role == 'CLIENT'}">
+            All restaurant orders
+        </p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;"
+         th:if="${loggedInPerson != null and loggedInPerson.role == 'CLIENT'}">
+        <a th:href="@{/orders/new}" class="btn btn-primary">+ New Order</a>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+    <div class="card">
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Client</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th>Prep Time</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.id()}">1</td>
+                <td th:text="${order.clientName()}">Mariana Souza</td>
+                <td>
+                    <span th:if="${order.orderType() == 'PICKUP'}"> Pickup</span>
+                    <span th:unless="${order.orderType() == 'PICKUP'}"> Delivery</span>
+                </td>
+                <td>
+                    <span class="badge"
+                          th:classappend="'badge-' + ${#strings.toLowerCase(order.orderStatus())}"
+                          th:text="${order.orderStatus()}">INITIALIZED</span>
+                </td>
+                <td>R$ <span th:text="${#numbers.formatDecimal(order.totalPrice(), 1, 2)}">84.00</span></td>
+                <td th:text="${order.estimatedPrepTime()} + ' min'">30 min</td>
+                <td>
+                    <a th:href="@{/orders/{id}(id=${order.id()})}"
+                       class="btn btn-sm btn-outline">View</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(orders)}">
+                <td colspan="7" style="text-align:center; color:var(--cinza); padding:2rem;">
+                    No orders found.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(~{::title}, ~{::section})}">
+<head><title>Reservation Detail — Sabor Mineiro</title></head>
+<body>
+<section>
+    <div class="page-header">
+        <h1>Reservation <span th:text="'#' + ${reservation.id()}">#1</span></h1>
+        <p>Reservation details</p>
+    </div>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-error"   th:if="${error}"   th:text="${error}"></div>
+
+    <div class="card">
+        <h2>Reservation Information</h2>
+        <div class="detail-row">
+            <span class="detail-label">Client</span>
+            <span th:text="${reservation.clientName()}">Mariana Souza</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Date &amp; Time</span>
+            <span th:text="${#temporals.format(reservation.dateTime(), 'dd/MM/yyyy HH:mm')}">15/01/2024 19:00</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Number of Guests</span>
+            <span th:text="${reservation.countOfPeople()}">4</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Table</span>
+            <span>
+                Table #<span th:text="${reservation.tableId()}">2</span>
+                (capacity: <span th:text="${reservation.tableMaxPeople()}">4</span> people)
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Table Currently Occupied</span>
+            <span th:if="${reservation.tableOccupied()}"
+                  class="badge badge-ongoing">Yes — Table Occupied</span>
+            <span th:unless="${reservation.tableOccupied()}"
+                  class="badge badge-accepted">No — Table Free</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Status</span>
+            <span class="badge"
+                  th:classappend="'badge-' + ${#strings.toLowerCase(reservation.reservationStatus())}"
+                  th:text="${reservation.reservationStatus()}">ACCEPTED</span>
+        </div>
+    </div>
+
+    <!-- CANCEL — Waiter only -->
+    <div class="card"
+         th:if="${loggedInPerson != null
+                  and loggedInPerson.role == 'WAITER'
+                  and reservation.reservationStatus() != 'COMPLETED'
+                  and reservation.reservationStatus() != 'CANCELLED'}">
+        <h2>Cancel Reservation</h2>
+        <p style="color:var(--cinza); font-size:0.9rem; margin-bottom:1rem;">
+            Reservation statuses are updated automatically:
+            <strong>ACCEPTED → ONGOING</strong> at reservation time,
+            <strong>ONGOING → COMPLETED</strong> after 2 hours.
+            You can only manually cancel a reservation.
+        </p>
+        <form th:action="@{/reservations/{id}/status(id=${reservation.id()})}"
+              method="post"
+              onsubmit="return confirm('Are you sure you want to cancel this reservation?')">
+            <input type="hidden" name="status" value="CANCELLED"/>
+            <button type="submit" class="btn btn-danger">✕ Cancel Reservation</button>
+        </form>
+    </div>
+
+    <div class="alert alert-info"
+         th:if="${loggedInPerson != null
+                  and loggedInPerson.role == 'WAITER'
+                  and (reservation.reservationStatus() == 'COMPLETED'
+                       or reservation.reservationStatus() == 'CANCELLED')}">
+        This reservation is
+        <strong th:text="${reservation.reservationStatus()}">COMPLETED</strong>
+        — no further changes possible.
+    </div>
+
+    <div class="actions">
+        <a th:href="@{/reservations}" class="btn btn-outline">← Back to Reservations</a>
+        <a th:if="${reservation.canReschedule()
+                    and loggedInPerson != null
+                    and loggedInPerson.role == 'CLIENT'
+                    and reservation.clientId() == loggedInPerson.id}"
+           th:href="@{/reservations/{id}/reschedule(id=${reservation.id()})}"
+           class="btn btn-secondary">Reschedule</a>
+    </div>
+</section>
+</body>
+</html>
